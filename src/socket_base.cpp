@@ -364,7 +364,7 @@ int zmq::socket_base_t::bind (const char *addr_)
         // Save last endpoint URI
         listener->get_address (options.last_endpoint);
 
-        add_endpoint (options.last_endpoint.c_str (), (own_t *) listener);
+        add_endpoint (addr_, (own_t *) listener);
         return 0;
     }
 
@@ -383,7 +383,7 @@ int zmq::socket_base_t::bind (const char *addr_)
         // Save last endpoint URI
         listener->get_address (options.last_endpoint);
 
-        add_endpoint (options.last_endpoint.c_str (), (own_t *) listener);
+        add_endpoint (addr_, (own_t *) listener);
         return 0;
     }
 #endif
@@ -394,6 +394,7 @@ int zmq::socket_base_t::bind (const char *addr_)
 
 int zmq::socket_base_t::connect (const char *addr_)
 {
+	//printf();
     if (unlikely (ctx_terminated)) {
         errno = ETERM;
         return -1;
@@ -600,8 +601,6 @@ int zmq::socket_base_t::term_endpoint (const char *addr_)
 
     // Disconnect an inproc socket
     if (protocol == "inproc") {
-        if (unregister_endpoint (std::string (addr_), this) == 0)
-            return 0;
         std::pair <inprocs_t::iterator, inprocs_t::iterator> range = inprocs.equal_range (std::string (addr_));
         if (range.first == range.second) {
             errno = ENOENT;

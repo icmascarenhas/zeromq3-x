@@ -47,7 +47,7 @@ void zmq::tune_tcp_socket (fd_t s_)
     int rc = setsockopt (s_, IPPROTO_TCP, TCP_NODELAY, (char*) &nodelay,
         sizeof (int));
 #ifdef ZMQ_HAVE_WINDOWS
-    wsa_assert (rc != SOCKET_ERROR);
+    //wsa_assert (rc != SOCKET_ERROR);
 #else
     errno_assert (rc == 0);
 #endif

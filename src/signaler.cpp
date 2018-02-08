@@ -239,10 +239,10 @@ int zmq::signaler_t::make_fdpair (fd_t *r_, fd_t *w_)
 #elif defined ZMQ_HAVE_WINDOWS
     SECURITY_DESCRIPTOR sd = {0};
     SECURITY_ATTRIBUTES sa = {0};
-
+#ifndef WINCE
     InitializeSecurityDescriptor(&sd, SECURITY_DESCRIPTOR_REVISION);
     SetSecurityDescriptorDacl(&sd, TRUE, 0, FALSE);
-
+#endif
     sa.nLength = sizeof(SECURITY_ATTRIBUTES);
     sa.lpSecurityDescriptor = &sd;
 
@@ -253,10 +253,11 @@ int zmq::signaler_t::make_fdpair (fd_t *r_, fd_t *w_)
     //  Note that if the event object already exists, the CreateEvent requests
     //  EVENT_ALL_ACCESS access right. If this fails, we try to open
     //  the event object asking for SYNCHRONIZE access only.
-    HANDLE sync = CreateEvent (&sa, FALSE, TRUE, TEXT ("Global\\zmq-signaler-port-sync"));
+    HANDLE sync = CreateEvent (NULL, FALSE, TRUE, TEXT ("Global\\zmq-signaler-port-sync"));
+	//printf("sync1=%d:: Lasterror=%d\n",sync,GetLastError ());
     if (sync == NULL && GetLastError () == ERROR_ACCESS_DENIED)
       sync = OpenEvent (SYNCHRONIZE | EVENT_MODIFY_STATE, FALSE, TEXT ("Global\\zmq-signaler-port-sync"));
-
+	//printf("sync2=%d:: Lasterror=%d\n",sync,GetLastError ());
     win_assert (sync != NULL);
 
     //  Enter the critical section.
@@ -299,11 +300,12 @@ int zmq::signaler_t::make_fdpair (fd_t *r_, fd_t *w_)
     //  Create the writer socket.
     *w_ = WSASocket (AF_INET, SOCK_STREAM, 0, NULL, 0,  0);
     wsa_assert (*w_ != INVALID_SOCKET);
-
+	BOOL brc;
+#ifndef WINCE
     //  On Windows, preventing sockets to be inherited by child processes.
-    BOOL brc = SetHandleInformation ((HANDLE) *w_, HANDLE_FLAG_INHERIT, 0);
+    brc = SetHandleInformation ((HANDLE) *w_, HANDLE_FLAG_INHERIT, 0);
     win_assert (brc);
-
+#endif
     //  Set TCP_NODELAY on writer socket.
     rc = setsockopt (*w_, IPPROTO_TCP, TCP_NODELAY,
         (char *)&tcp_nodelay, sizeof (tcp_nodelay));
@@ -337,11 +339,12 @@ int zmq::signaler_t::make_fdpair (fd_t *r_, fd_t *w_)
     brc = CloseHandle (sync);
     win_assert (brc != 0);
 
-    if (*r_ != INVALID_SOCKET) {
+	if (*r_ != INVALID_SOCKET) {
         //  On Windows, preventing sockets to be inherited by child processes.
-        brc = SetHandleInformation ((HANDLE) *r_, HANDLE_FLAG_INHERIT, 0);
+#ifndef WINCE
+		brc = SetHandleInformation ((HANDLE) *r_, HANDLE_FLAG_INHERIT, 0);
         win_assert (brc);
-
+#endif
         return 0;
     } else {
         //  Cleanup writer if connection failed

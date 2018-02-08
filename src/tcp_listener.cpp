@@ -173,9 +173,11 @@ int zmq::tcp_listener_t::set_address (const char *addr_)
         errno = wsa_error_to_errno (WSAGetLastError ());
         return -1;
     }
-    //  On Windows, preventing sockets to be inherited by child processes.
+#ifndef WINCE
+	//  On Windows, preventing sockets to be inherited by child processes.
     BOOL brc = SetHandleInformation ((HANDLE) s, HANDLE_FLAG_INHERIT, 0);
     win_assert (brc);
+#endif
 #else
     if (s == -1)
         return -1;
@@ -189,8 +191,9 @@ int zmq::tcp_listener_t::set_address (const char *addr_)
     //  Allow reusing of the address.
     int flag = 1;
 #ifdef ZMQ_HAVE_WINDOWS
-    rc = setsockopt (s, SOL_SOCKET, SO_EXCLUSIVEADDRUSE,
-        (const char*) &flag, sizeof (int));
+    rc = setsockopt (s, SOL_SOCKET, SO_REUSEADDR,(const char*) &flag, sizeof (int));
+	//printf("rc=%d\n",rc);
+	//printf("rc=%d:: Lasterror=%d\n",rc,WSAGetLastError());
     wsa_assert (rc != SOCKET_ERROR);
 #else
     rc = setsockopt (s, SOL_SOCKET, SO_REUSEADDR, &flag, sizeof (int));
@@ -256,9 +259,11 @@ zmq::fd_t zmq::tcp_listener_t::accept ()
             WSAGetLastError () == WSAENOBUFS);
         return retired_fd;
     }
-    //  On Windows, preventing sockets to be inherited by child processes.
+#ifndef WINCE
+	//  On Windows, preventing sockets to be inherited by child processes.
     BOOL brc = SetHandleInformation ((HANDLE) sock, HANDLE_FLAG_INHERIT, 0);
     win_assert (brc);
+#endif
 #else
     if (sock == -1) {
         errno_assert (errno == EAGAIN || errno == EWOULDBLOCK ||

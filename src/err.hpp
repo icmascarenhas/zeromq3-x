@@ -62,39 +62,15 @@ namespace zmq
 
 //  Provides convenient way to check WSA-style errors on Windows.
 #define wsa_assert(x) \
-    do {\
-        if (unlikely (!(x))) {\
-            const char *errstr = zmq::wsa_error ();\
-            if (errstr != NULL) {\
-                fprintf (stderr, "Assertion failed: %s (%s:%d)\n", errstr, \
-                    __FILE__, __LINE__);\
-                zmq::zmq_abort (errstr);\
-            }\
-        }\
-    } while (false)
+ 
 
 //  Provides convenient way to assert on WSA-style errors on Windows.
 #define wsa_assert_no(no) \
-    do {\
-        const char *errstr = zmq::wsa_error_no (no);\
-        if (errstr != NULL) {\
-            fprintf (stderr, "Assertion failed: %s (%s:%d)\n", errstr, \
-                __FILE__, __LINE__);\
-            zmq::zmq_abort (errstr);\
-        }\
-    } while (false)
+    
 
 // Provides convenient way to check GetLastError-style errors on Windows.
 #define win_assert(x) \
-    do {\
-        if (unlikely (!(x))) {\
-            char errstr [256];\
-            zmq::win_error (errstr, 256);\
-            fprintf (stderr, "Assertion failed: %s (%s:%d)\n", errstr, \
-                __FILE__, __LINE__);\
-            zmq::zmq_abort (errstr);\
-        }\
-    } while (false)
+  
 
 #endif
 
@@ -102,53 +78,21 @@ namespace zmq
 //  in its stead because standard assert on Win32 in broken - it prints nothing
 //  when used within the scope of JNI library.
 #define zmq_assert(x) \
-    do {\
-        if (unlikely (!(x))) {\
-            fprintf (stderr, "Assertion failed: %s (%s:%d)\n", #x, \
-                __FILE__, __LINE__);\
-            zmq::zmq_abort (#x);\
-        }\
-    } while (false) 
-
+   
 //  Provides convenient way to check for errno-style errors.
 #define errno_assert(x) \
-    do {\
-        if (unlikely (!(x))) {\
-            const char *errstr = strerror (errno);\
-            fprintf (stderr, "%s (%s:%d)\n", errstr, __FILE__, __LINE__);\
-            zmq::zmq_abort (errstr);\
-        }\
-    } while (false)
-
+    
 //  Provides convenient way to check for POSIX errors.
 #define posix_assert(x) \
-    do {\
-        if (unlikely (x)) {\
-            const char *errstr = strerror (x);\
-            fprintf (stderr, "%s (%s:%d)\n", errstr, __FILE__, __LINE__);\
-            zmq::zmq_abort (errstr);\
-        }\
-    } while (false)
+   
 
 //  Provides convenient way to check for errors from getaddrinfo.
 #define gai_assert(x) \
-    do {\
-        if (unlikely (x)) {\
-            const char *errstr = gai_strerror (x);\
-            fprintf (stderr, "%s (%s:%d)\n", errstr, __FILE__, __LINE__);\
-            zmq::zmq_abort (errstr);\
-        }\
-    } while (false)
+  
 
 //  Provides convenient way to check whether memory allocation have succeeded.
 #define alloc_assert(x) \
-    do {\
-        if (unlikely (!x)) {\
-            fprintf (stderr, "FATAL ERROR: OUT OF MEMORY (%s:%d)\n",\
-                __FILE__, __LINE__);\
-            zmq::zmq_abort ("FATAL ERROR: OUT OF MEMORY");\
-        }\
-    } while (false)
+    
 
 #endif
 

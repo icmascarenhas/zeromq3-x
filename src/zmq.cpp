@@ -152,6 +152,14 @@ void *zmq_ctx_new (void)
     WORD version_requested = MAKEWORD (2, 2);
     WSADATA wsa_data;
     int rc = WSAStartup (version_requested, &wsa_data);
+	if(rc==10091)
+	{
+		for(int count=0;count<5&&rc!=0;count++)
+		{
+			Sleep(100);
+			rc = WSAStartup (version_requested, &wsa_data);
+		}
+	}
     zmq_assert (rc == 0);
     zmq_assert (LOBYTE (wsa_data.wVersion) == 2 &&
         HIBYTE (wsa_data.wVersion) == 2);

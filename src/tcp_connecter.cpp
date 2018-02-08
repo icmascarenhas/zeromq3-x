@@ -276,7 +276,8 @@ zmq::fd_t zmq::tcp_connecter_t::connect ()
             err == WSAENETDOWN ||
             err == WSAEINVAL)
             return retired_fd;
-        wsa_assert_no (err);
+		return rc;
+        //wsa_assert_no (err);
     }
 #else
 

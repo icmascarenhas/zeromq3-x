@@ -26,11 +26,11 @@
 // Windows headers
 #include "platform.hpp"
 #include "windows.hpp"
-#include <fcntl.h>
-#include <intrin.h>
-#include <io.h>
+//#include <fcntl.h>
+//#include <intrin.h>
+//#include <io.h>
 #include <rpc.h>
-#include <sys/stat.h>
+//#include <sys/stat.h>
 
 // standard C++ headers
 #include <algorithm>

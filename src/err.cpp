@@ -65,6 +65,7 @@ const char *zmq::errno_to_string (int errno_)
 
 void zmq::zmq_abort(const char *errmsg_)
 {
+	return;
 #if defined ZMQ_HAVE_WINDOWS
 
     //  Raise STATUS_FATAL_APP_EXIT.
@@ -207,8 +208,11 @@ void zmq::win_error (char *buffer_, size_t buffer_size_)
     DWORD rc = FormatMessage (FORMAT_MESSAGE_FROM_SYSTEM |
         FORMAT_MESSAGE_IGNORE_INSERTS, NULL, errcode, MAKELANGID(LANG_NEUTRAL,
         SUBLANG_DEFAULT), (LPWSTR)buffer_, buffer_size_ / sizeof(wchar_t), NULL );
+	   //UNICODE;_UNICODE
+	   //SUBLANG_DEFAULT), buffer_, buffer_size_ / sizeof(wchar_t), NULL );
 #else
-    DWORD rc = FormatMessageA (FORMAT_MESSAGE_FROM_SYSTEM |
+    DWORD rc = FormatMessageA
+		(FORMAT_MESSAGE_FROM_SYSTEM |
         FORMAT_MESSAGE_IGNORE_INSERTS, NULL, errcode, MAKELANGID(LANG_NEUTRAL,
         SUBLANG_DEFAULT), buffer_, (DWORD) buffer_size_, NULL );
 #endif
@@ -222,8 +226,10 @@ int zmq::wsa_error_to_errno (int errcode)
     case WSAEBADF:
         return EBADF;
 //  10013 - Permission denied.
-    case WSAEACCES:
+#ifndef WINCE
+	case WSAEACCES:
         return EACCES;
+#endif
 //  10014 - Bad address.
     case WSAEFAULT:
         return EFAULT;
